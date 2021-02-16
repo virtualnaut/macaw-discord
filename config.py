@@ -24,7 +24,7 @@ class CredentialsConfig(Config):
         self.aws_access_key_id = self._parser['default']['aws_access_key_id']
         self.aws_secret_access_key = self._parser['default']['aws_secret_access_key']
         self.discord_bot_token = self._parser['default']['discord_bot_token']
-        self.macaw_password = self._parser['default']['macaw_password']
+        self.macaw_key = self._parser['default']['macaw_key']
 
 #
 # Class for non-credential AWS config.

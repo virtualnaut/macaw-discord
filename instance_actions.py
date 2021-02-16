@@ -56,12 +56,13 @@ class AWSManager:
 
     def get_status(self) -> tuple:
         self._refresh()
-        return (
-            aws_config.instance,
-            self._instance.state['Code'],
-            self._instance.state['Name'],
-            self._instance.state_transition_reason
-        )
+        return {
+            'instance_id': aws_config.instance,
+            'state_code': self._instance.state['Code'],
+            'state_name': self._instance.state['Name'],
+            'state_reason': self._instance.state_transition_reason,
+            'ip_address': self._instance.public_ip_address
+        }
 
     def _refresh(self):
         self._instance = self._ec2.Instance(aws_config.instance)

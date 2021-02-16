@@ -47,13 +47,16 @@ class MacawBot(discord.Client):
             status = aws.get_status()
             embed = discord.Embed(
                 title='Instance Status',
-                color=STATUS_COLOURS[status[1]]
+                color=STATUS_COLOURS[status['state_code']]
             )
-            embed.add_field(name='Instance ID', value=status[0], inline=False)
-            embed.add_field(name='Status', value=status[2].title(), inline=False)
+            embed.add_field(name='Instance ID', value=status['instance_id'], inline=False)
+            embed.add_field(name='Status', value=status['state_name'].title(), inline=False)
 
-            if status[3] != '':
-                embed.add_field(name='Reason', value=status[3], inline=False)
+            if status['state_reason'] != '':
+                embed.add_field(name='Reason', value=status['state_reason'], inline=False)
+
+            if status['ip_address'] is not None:
+                embed.add_field(name='Public IP Address', value=status['ip_address'], inline=False)
 
             await message.channel.send(embed=embed)
 
