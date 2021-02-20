@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 "discord.py" = "*"
 boto3 = "*"
+requests = "*"
 
 [dev-packages]
 
