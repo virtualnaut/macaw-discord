@@ -2,6 +2,7 @@ import discord
 
 import config
 import observers
+from permissions import can_perform, Action
 from instance_actions import AWSManager
 from macaw_actions import MacawManager
 
@@ -64,7 +65,7 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Cannot Stop Instance!', color=0xd11f00, description=result[1])
                 await message.channel.send(embed=embed)
 
-        elif message.content == '>status':
+        elif (message.content == '>status') and (can_perform(Action.STATUS, message.author, message.guild)):
             status = aws.get_status()
             embed = discord.Embed(
                 title='Instance Status',
@@ -80,6 +81,7 @@ class MacawBot(discord.Client):
                 embed.add_field(name='Public IP Address', value=status['ip_address'], inline=False)
 
             await message.channel.send(embed=embed)
+
 
 client = MacawBot()
 client.run(credentials.discord_bot_token)
