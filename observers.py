@@ -3,7 +3,7 @@ import time
 import discord
 
 import config
-from instance_actions import InstanceState
+from aws_actions import InstanceState
 from macaw_actions import MacawState
 
 settings = config.SettingsConfig()

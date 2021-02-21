@@ -1,9 +1,11 @@
+import re
+
 import discord
 
 import config
 import observers
 from permissions import can_perform, Action
-from instance_actions import AWSManager
+from aws_actions import AWSManager
 from macaw_actions import MacawManager
 
 credentials = config.CredentialsConfig()
@@ -84,6 +86,9 @@ class MacawBot(discord.Client):
                 embed.add_field(name='Public IP Address', value=status['ip_address'], inline=False)
 
             await message.channel.send(embed=embed)
+
+        elif (message.content.startswith('>usage')) and (can_perform(Action.USAGE, message.author, message.guild)):
+            print(aws.get_usage())
 
 
 client = MacawBot()

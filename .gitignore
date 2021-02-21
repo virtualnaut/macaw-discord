@@ -3,3 +3,5 @@ settings.ini
 Lib
 Scripts
 pyvenv.cfg
+.idea
+.vscode

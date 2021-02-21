@@ -2,7 +2,7 @@ import requests
 from requests.exceptions import Timeout
 import config
 
-from instance_actions import InstanceState
+from aws_actions import InstanceState
 
 credentials = config.CredentialsConfig()
 

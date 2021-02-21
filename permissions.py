@@ -7,14 +7,15 @@ class Action:
     STOP = 0
     START = 1
     STATUS = 2
+    USAGE = 3
 
 
 permissions = {
     'starter': [Action.START],
     'stopper': [Action.STOP],
-    'admin': [Action.START, Action.STOP, Action.STATUS],
     'status': [Action.STATUS],
-    'trusted': [Action.START, Action.STATUS]
+    'admin': [Action.START, Action.STOP, Action.STATUS, Action.USAGE],
+    'trusted': [Action.START, Action.STATUS, Action.USAGE]
 }
 
 
