@@ -54,7 +54,7 @@ class AWSManager:
         else:
             return (False, 'The instance cannot be stopped from it\'s current state.')
 
-    def get_status(self) -> tuple:
+    def get_status(self) -> dict:
         self._refresh()
         return {
             'instance_id': aws_config.instance,

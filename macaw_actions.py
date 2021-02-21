@@ -14,6 +14,8 @@ class MacawState:
     running = 3
     stopping = 4
     macaw_starting = 5
+    macaw_stopping = 6
+    macaw_stopped = 7
 
 
 JSON_REPONSE_MAP = {
@@ -28,7 +30,7 @@ class MacawManager:
     def __init__(self, aws_manager):
         self._aws_manager = aws_manager
 
-    def get_state(self) -> int:
+    def get_state(self, starting=True) -> int:
         # Check that the instance is running.
         if self._aws_manager.get_state() == InstanceState.running:
             try:
@@ -36,15 +38,30 @@ class MacawManager:
                                    credentials.macaw_key), timeout=3,
                                    verify=False)
             except Timeout:
-                return MacawState.macaw_starting
+                if starting:
+                    return MacawState.macaw_starting
+                else:
+                    return MacawState.macaw_stopped
+            except:
+                if starting:
+                    return MacawState.macaw_starting
+                else:
+                    return MacawState.macaw_stopping
 
             json = res.json()
 
             return JSON_REPONSE_MAP[json['status']]
         return MacawState.instance_stopped
 
-    """
-    def stop_mc_server(self):
+    def shutdown(self):
         # Check that the instance is running.
-        if self._aws_manager.get_state == InstanceState.running:
-    """
+        if self._aws_manager.get_state() == InstanceState.running:
+            try:
+                res = requests.get('https://{}:8080/kill?key={}'.format(self._aws_manager.get_public_ip(),
+                                   credentials.macaw_key), timeout=3,
+                                   verify=False)
+                return True, 'Shutting system down...'
+            except Timeout:
+                return False, 'Failed to contact the Macaw server.'
+
+        return False, 'The instance is not running!'
