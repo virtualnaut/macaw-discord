@@ -1,11 +1,15 @@
 import discord
+
 import config
+import observers
 from instance_actions import AWSManager
+from macaw_actions import MacawManager
 
 credentials = config.CredentialsConfig()
 aws_config = config.AWSConfig()
 
 aws = AWSManager()
+macaw = MacawManager(aws)
 
 STATUS_COLOURS = {
     0: 0xb8b9ba,
@@ -29,16 +33,33 @@ class MacawBot(discord.Client):
             result = aws.start()
             
             if result[0]:
-                await message.channel.send('Starting instance...')
+                embed = discord.Embed(title='Starting...', color=0xd11f00, description='No public IP address yet...')
+                embed.add_field(name='EC2 Instance', value=':red_square: Stopped')
+                embed.add_field(name='Macaw Server', value=':red_square: Stopped')
+                embed.add_field(name='Minecraft Server', value=':red_square: Stopped')
+
+                message = await message.channel.send(embed=embed)
+
+                observer = observers.StartObserver(aws, macaw, message)
+                await observer.dispatch()
             else:
                 embed = discord.Embed(title='Cannot Start Instance!', color=0xd11f00, description=result[1])
                 await message.channel.send(embed=embed)
 
         elif message.content == '>stop':
-            result = aws.stop()
+            # result = aws.stop()
+            result = macaw.shutdown()
             
             if result[0]:
-                await message.channel.send('Stopping instance...')
+                embed = discord.Embed(title='Stopping...', color=0xd11f00)
+                embed.add_field(name='EC2 Instance', value=':green_square: Running')
+                embed.add_field(name='Macaw Server', value=':green_square: Running')
+                embed.add_field(name='Minecraft Server', value=':green_square: Running')
+
+                message = await message.channel.send(embed=embed)
+
+                observer = observers.StopObserver(aws, macaw, message)
+                await observer.dispatch()
             else:
                 embed = discord.Embed(title='Cannot Stop Instance!', color=0xd11f00, description=result[1])
                 await message.channel.send(embed=embed)
