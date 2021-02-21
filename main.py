@@ -3,11 +3,13 @@ import discord
 import config
 import observers
 from instance_actions import AWSManager
+from macaw_actions import MacawManager
 
 credentials = config.CredentialsConfig()
 aws_config = config.AWSConfig()
 
 aws = AWSManager()
+macaw = MacawManager(aws)
 
 STATUS_COLOURS = {
     0: 0xb8b9ba,
@@ -33,10 +35,12 @@ class MacawBot(discord.Client):
             if result[0]:
                 embed = discord.Embed(title='Starting...', color=0xd11f00)
                 embed.add_field(name='EC2 Instance', value=':red_square: Stopped')
+                embed.add_field(name='Macaw Server', value=':red_square: Stopped')
+                embed.add_field(name='Minecraft Server', value=':red_square: Stopped')
 
                 message = await message.channel.send(embed=embed)
 
-                observer = observers.StartObserver(aws, message)
+                observer = observers.StartObserver(aws, macaw, message)
                 await observer.dispatch()
             else:
                 embed = discord.Embed(title='Cannot Start Instance!', color=0xd11f00, description=result[1])

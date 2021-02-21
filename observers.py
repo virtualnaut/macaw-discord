@@ -5,6 +5,7 @@ import requests
 
 import config
 from instance_actions import InstanceState
+from macaw_actions import MacawState
 import discord
 
 settings = config.SettingsConfig()
@@ -26,18 +27,21 @@ instance_state_map = {
 }
 
 macaw_state_map = {
-    'starting': GeneralState.starting,
-    'running': GeneralState.running,
-    'stopping': GeneralState.stopping,
-    'stopped': GeneralState.stopped
+    MacawState.starting: GeneralState.starting,
+    MacawState.running: GeneralState.running,
+    MacawState.stopping: GeneralState.stopping,
+    MacawState.stopped: GeneralState.stopped,
+    MacawState.instance_stopped: GeneralState.stopped,
+    MacawState.macaw_starting: GeneralState.starting
 }
 
 STATE_EMOJIS = ['red_square', 'orange_square', 'green_square', 'white_large_square', 'warning']
 STATE_DISPLAY_NAMES = ['Stopped', 'Starting', 'Running', 'Stopping', 'Invalid State']
 
 class StartObserver:
-    def __init__(self, manager, message):
-        self._manager = manager
+    def __init__(self, aws_manager, macaw_manager, message):
+        self._aws_manager = aws_manager
+        self._macaw_manager = macaw_manager
         self._message = message
 
     async def _setEmbed(self, instance_state: int, macaw_state: int, mc_state: int):
@@ -50,12 +54,14 @@ class StartObserver:
 
         embed = discord.Embed(title='Starting...', color=colour)
         embed.add_field(name='EC2 Instance', value=':{}: {}'.format(STATE_EMOJIS[instance_state], STATE_DISPLAY_NAMES[instance_state]))
+        embed.add_field(name='Macaw Server', value=':{}: {}'.format(STATE_EMOJIS[macaw_state], STATE_DISPLAY_NAMES[macaw_state]))
+        embed.add_field(name='Minecraft Server', value=':{}: {}'.format(STATE_EMOJIS[mc_state], STATE_DISPLAY_NAMES[mc_state]))
 
         await self._message.edit(embed=embed) 
 
     async def _waitForInstance(self):
         prev_state = None
-        state = self._manager.get_state()
+        state = self._aws_manager.get_state()
 
         await self._setEmbed(instance_state_map[state], GeneralState.stopped, GeneralState.stopped)
 
@@ -66,21 +72,34 @@ class StartObserver:
                 await self._setEmbed(instance_state_map[state], GeneralState.stopped, GeneralState.stopped)
 
             prev_state = state
-            state = self._manager.get_state()
+            state = self._aws_manager.get_state()
         
         await self._setEmbed(instance_state_map[state], GeneralState.stopped, GeneralState.stopped)
 
     async def _waitForMacaw(self):
         prev_state = None
-        state = GeneralState.stopped
+        state = self._macaw_manager.get_state()
 
-        while state != GeneralState.running:
+        while state != MacawState.running:
+            if state != prev_state:
+                if state == MacawState.macaw_starting:
+                    await self._setEmbed(GeneralState.running, macaw_state_map[state], GeneralState.stopped)
+                else:
+                    await self._setEmbed(GeneralState.running, GeneralState.running, macaw_state_map[state])
 
             time.sleep(settings.check_delay)
 
+            prev_state = state
+            state = self._macaw_manager.get_state()
+
+        if state == MacawState.macaw_starting:
+            await self._setEmbed(GeneralState.running, macaw_state_map[state], GeneralState.stopped)
+        else:
+            await self._setEmbed(GeneralState.running, GeneralState.running, macaw_state_map[state])
+
     async def _run(self):
         await self._waitForInstance()
-        # await self._waitForMacaw()
+        await self._waitForMacaw()
 
     async def dispatch(self):
         await self._run()

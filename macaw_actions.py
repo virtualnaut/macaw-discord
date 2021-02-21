@@ -8,11 +8,12 @@ credentials = config.CredentialsConfig()
 
 
 class MacawState:
-    timeout = 0
+    instance_stopped = 0
     stopped = 1
     starting = 2
     running = 3
     stopping = 4
+    macaw_starting = 5
 
 JSON_REPONSE_MAP = {
     'stopped': MacawState.stopped,
@@ -29,11 +30,13 @@ class MacawManager:
     def get_state(self) -> int:
         # Check that the instance is running.
         if self._aws_manager.get_state == InstanceState.running:
+            print('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(), config.macaw_key))
             try:
-                res = requests.get('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip, config.macaw_key), timeout=3)
+                res = requests.get('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(), config.macaw_key), timeout=3)
             except Timeout:
-                return MacawState.timeout
+                return MacawState.macaw_starting
 
             json = res.json()
 
-            return JSON_REPONSE_MAP[json['status']]            
+            return JSON_REPONSE_MAP[json['status']]
+        return MacawState.instance_stopped
