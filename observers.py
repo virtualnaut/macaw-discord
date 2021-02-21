@@ -62,17 +62,20 @@ class StartObserver:
                 mc_state == GeneralState.stopped:
             # All processes are stopped, red embed.
             colour = 0xd11f00
+            title = 'Starting...'
         elif instance_state == GeneralState.running and \
                 macaw_state == GeneralState.running and \
                 mc_state == GeneralState.running:
             # All processes are running, green embed.
             colour = 0x04d45b
+            title = 'Started!'
         else:
-            # Processes are starting, grey embed.
-            colour = 0xb8b9ba
+            # Processes are starting, yellow embed.
+            colour = 0xd18100
+            title = 'Starting...'
 
         # Construct the embed.
-        embed = discord.Embed(title='Starting...', color=colour)
+        embed = discord.Embed(title=title, color=colour)
         embed.add_field(name='EC2 Instance', value=':{}: {}'.format(STATE_EMOJIS[instance_state], STATE_DISPLAY_NAMES[instance_state]))
         embed.add_field(name='Macaw Server', value=':{}: {}'.format(STATE_EMOJIS[macaw_state], STATE_DISPLAY_NAMES[macaw_state]))
         embed.add_field(name='Minecraft Server', value=':{}: {}'.format(STATE_EMOJIS[mc_state], STATE_DISPLAY_NAMES[mc_state]))

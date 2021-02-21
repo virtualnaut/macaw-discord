@@ -31,10 +31,10 @@ class MacawManager:
     def get_state(self) -> int:
         # Check that the instance is running.
         if self._aws_manager.get_state() == InstanceState.running:
-            print('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(), credentials.macaw_key))
             try:
                 res = requests.get('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(),
-                                                                          credentials.macaw_key), timeout=3, verify=False)
+                                   credentials.macaw_key), timeout=3,
+                                   verify=False)
             except Timeout:
                 return MacawState.macaw_starting
 
