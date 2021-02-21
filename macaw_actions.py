@@ -15,6 +15,7 @@ class MacawState:
     stopping = 4
     macaw_starting = 5
 
+
 JSON_REPONSE_MAP = {
     'stopped': MacawState.stopped,
     'starting': MacawState.starting,
@@ -29,10 +30,11 @@ class MacawManager:
 
     def get_state(self) -> int:
         # Check that the instance is running.
-        if self._aws_manager.get_state == InstanceState.running:
-            print('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(), config.macaw_key))
+        if self._aws_manager.get_state() == InstanceState.running:
+            print('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(), credentials.macaw_key))
             try:
-                res = requests.get('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(), config.macaw_key), timeout=3)
+                res = requests.get('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(),
+                                                                          credentials.macaw_key), timeout=3, verify=False)
             except Timeout:
                 return MacawState.macaw_starting
 
@@ -40,3 +42,9 @@ class MacawManager:
 
             return JSON_REPONSE_MAP[json['status']]
         return MacawState.instance_stopped
+
+    """
+    def stop_mc_server(self):
+        # Check that the instance is running.
+        if self._aws_manager.get_state == InstanceState.running:
+    """
