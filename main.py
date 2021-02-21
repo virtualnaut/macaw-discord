@@ -30,7 +30,10 @@ class MacawBot(discord.Client):
         if message.author == self.user:
             return
 
-        if message.content == '>start':
+        if not message.content.startswith('>'):
+            return
+
+        if (message.content == '>start') and (can_perform(Action.START, message.author, message.guild)):
             result = aws.start()
             
             if result[0]:
@@ -47,7 +50,7 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Cannot Start Instance!', color=0xd11f00, description=result[1])
                 await message.channel.send(embed=embed)
 
-        elif message.content == '>stop':
+        elif (message.content == '>stop') and (can_perform(Action.STOP, message.author, message.guild)):
             # result = aws.stop()
             result = macaw.shutdown()
             

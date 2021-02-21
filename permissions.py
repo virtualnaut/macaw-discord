@@ -19,6 +19,9 @@ permissions = {
 
 
 def can_perform(action, member, guild):
+    if member.id == settings.owner:
+        return True
+
     roles = settings.roles.items()
 
     member_actions = set()

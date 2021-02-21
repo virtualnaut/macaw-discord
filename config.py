@@ -56,3 +56,5 @@ class SettingsConfig(Config):
             'status': self._parser['default']['status_role'],
             'trusted': self._parser['default']['trusted_role']
         }
+
+        self.owner = int(self._parser['default']['owner'])
