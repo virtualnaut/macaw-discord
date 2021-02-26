@@ -48,3 +48,13 @@ class SettingsConfig(Config):
         self._parse('./config/settings.ini')
 
         self.check_delay = int(self._parser['default']['check_delay'])
+
+        self.roles = {
+            'starter': self._parser['default']['starter_role'],
+            'stopper': self._parser['default']['stopper_role'],
+            'admin': self._parser['default']['admin_role'],
+            'status': self._parser['default']['status_role'],
+            'trusted': self._parser['default']['trusted_role']
+        }
+
+        self.owner = int(self._parser['default']['owner'])

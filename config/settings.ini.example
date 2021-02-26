@@ -1,0 +1,8 @@
+[default]
+check_delay=3
+starter_role=macaw-starter
+stopper_role=macaw-stopper
+admin_role=macaw-admin
+trusted_role=macaw-trusted-user
+status_role=macaw-status
+owner=YOUR_DISCORD_ID
