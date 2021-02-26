@@ -4,7 +4,7 @@ import discord
 
 import config
 import observers
-from permissions import can_perform, Action
+from permissions import allowed_commands, can_run, Action
 from aws_actions import AWSManager
 from macaw_actions import MacawManager
 
@@ -30,6 +30,19 @@ class EmbedColours:
 
 
 class MacawBot(discord.Client):
+    def __init__(self):
+        super().__init__()
+
+        self._commands = {
+            'help': (self._cmd_help, '`>help`: Display this help message.'),
+            'start': (self._cmd_start, '`>start`: Start the servers and instance.'),
+            'stop': (self._cmd_stop, '`>stop`: Stop the servers and instance.'),
+            'status': (self._cmd_status, '`>status`: Get the current status of the intance.'),
+            'issue': (self._cmd_issue, '`>issue [COMMAND]`: Issue a command to the Minecraft server.'),
+            'players': (self._cmd_players, '`>players`: Get a list of currently online players.'),
+            'dynmap': (self._cmd_dynmap, '`>dynmap`: Get the current dynmap address.')
+        }
+
     async def on_ready(self):
         print('Bot started.')
 
@@ -40,7 +53,13 @@ class MacawBot(discord.Client):
         if not message.content.startswith('>'):
             return
 
-        if (message.content == '>start') and (can_perform(Action.START, message.author, message.guild)):
+        commands = self._commands.values()
+        for command, _ in commands:
+            if can_run(command, message.author, message.guild):
+                await command(message)
+
+    async def _cmd_start(self, message):
+        if message.content == '>start':
             result = aws.start()
             
             if result[0]:
@@ -57,7 +76,8 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Cannot Start Instance!', color=0xd11f00, description=result[1])
                 await message.channel.send(embed=embed)
 
-        elif (message.content == '>stop') and (can_perform(Action.STOP, message.author, message.guild)):
+    async def _cmd_stop(self, message):
+        if message.content == '>stop':
             # result = aws.stop()
             result = macaw.shutdown()
             
@@ -75,7 +95,8 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Cannot Stop Instance!', color=0xd11f00, description=result[1])
                 await message.channel.send(embed=embed)
 
-        elif (message.content == '>status') and (can_perform(Action.STATUS, message.author, message.guild)):
+    async def _cmd_status(self, message):
+        if message.content == '>status':
             status = aws.get_status()
             embed = discord.Embed(
                 title='Instance Status',
@@ -92,7 +113,8 @@ class MacawBot(discord.Client):
 
             await message.channel.send(embed=embed)
 
-        elif (message.content.startswith('>issue')) and (can_perform(Action.ISSUE, message.author, message.guild)):
+    async def _cmd_issue(self, message):
+        if message.content.startswith('>issue'):
             result = macaw.issue(message.content[7:])
 
             if result[0]:
@@ -102,7 +124,8 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Command not issued', color=EmbedColours.FAIL, description=result[1])
                 await message.channel.send(embed=embed)
 
-        elif (message.content == '>players') and (can_perform(Action.VIEW_PLAYERS, message.author, message.guild)):
+    async def _cmd_players(self, message):
+        if message.content == '>players':
             result = macaw.get_online_players()
 
             if result[0]:
@@ -112,7 +135,8 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Cannot get players', color=EmbedColours.FAIL, description=result[1])
                 await message.channel.send(embed=embed)
 
-        elif (message.content == '>dynmap') and (can_perform(Action.DYNMAP, message.author, message.guild)):
+    async def _cmd_dynmap(self, message):
+        if message.content == '>dynmap':
             ip_address = aws.get_public_ip()
 
             if ip_address is not None:
@@ -121,6 +145,20 @@ class MacawBot(discord.Client):
             else:
                 embed = discord.Embed(title='Failed', color=EmbedColours.FAIL, description='Can\'t get the dynmap address if the instance isn\'t running!')
                 await message.channel.send(embed=embed)
+
+    async def _cmd_help(self, message):
+        if message.content == '>help':
+            commands = allowed_commands(message.author, message.guild)
+            content = 'You don\'t have permission to use any commands'
+            
+            if len(commands) != 0:
+                lines = []
+                for command in commands:
+                    lines.append(self._commands[command][1])
+                content = '\n'.join(lines)
+
+            embed = discord.Embed(title='Commands', color=EmbedColours.SUCCESS, description=content)
+            await message.channel.send(embed=embed)
 
 
 client = MacawBot()
