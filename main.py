@@ -10,6 +10,7 @@ from macaw_actions import MacawManager
 
 credentials = config.CredentialsConfig()
 aws_config = config.AWSConfig()
+settings = config.SettingsConfig()
 
 aws = AWSManager()
 macaw = MacawManager(aws)
@@ -101,7 +102,7 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Command not issued', color=EmbedColours.FAIL, description=result[1])
                 await message.channel.send(embed=embed)
 
-        elif (message.content.startswith('>players')) and (can_perform(Action.VIEW_PLAYERS, message.author, message.guild)):
+        elif (message.content == '>players') and (can_perform(Action.VIEW_PLAYERS, message.author, message.guild)):
             result = macaw.get_online_players()
 
             if result[0]:
@@ -109,6 +110,16 @@ class MacawBot(discord.Client):
                 await message.channel.send(embed=embed)
             else:
                 embed = discord.Embed(title='Cannot get players', color=EmbedColours.FAIL, description=result[1])
+                await message.channel.send(embed=embed)
+
+        elif (message.content == '>dynmap') and (can_perform(Action.DYNMAP, message.author, message.guild)):
+            ip_address = aws.get_public_ip()
+
+            if ip_address is not None:
+                embed = discord.Embed(title='Dynmap', color=EmbedColours.SUCCESS, description='{}:{}'.format(ip_address, settings.dynmap_port))
+                await message.channel.send(embed=embed)
+            else:
+                embed = discord.Embed(title='Failed', color=EmbedColours.FAIL, description='Can\'t get the dynmap address if the instance isn\'t running!')
                 await message.channel.send(embed=embed)
 
 

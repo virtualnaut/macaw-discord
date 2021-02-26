@@ -6,3 +6,4 @@ admin_role=macaw-admin
 trusted_role=macaw-trusted-user
 status_role=macaw-status
 owner=YOUR_DISCORD_ID
+dynmap_port=8123

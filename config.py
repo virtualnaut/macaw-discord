@@ -58,3 +58,5 @@ class SettingsConfig(Config):
         }
 
         self.owner = int(self._parser['default']['owner'])
+
+        self.dynmap_port = int(self._parser['default']['dynmap_port'])
