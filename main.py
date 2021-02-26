@@ -101,6 +101,16 @@ class MacawBot(discord.Client):
                 embed = discord.Embed(title='Command not issued', color=EmbedColours.FAIL, description=result[1])
                 await message.channel.send(embed=embed)
 
+        elif (message.content.startswith('>online')):
+            result = macaw.get_online_players()
+
+            if result[0]:
+                embed = discord.Embed(title='Online Players', color=EmbedColours.SUCCESS, description=result[1])
+                await message.channel.send(embed=embed)
+            else:
+                embed = discord.Embed(title='Cannot get players', color=EmbedColours.FAIL, description=result[1])
+                await message.channel.send(embed=embed)
+
 
 client = MacawBot()
 client.run(credentials.discord_bot_token)

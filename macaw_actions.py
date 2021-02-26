@@ -66,7 +66,7 @@ class MacawManager:
 
         return False, 'The instance is not running!'
 
-    def issue(self, command: str):
+    def issue(self, command: str) -> tuple:
         # Check that the instance is running.
         if self._aws_manager.get_state() == InstanceState.running:
             try:
@@ -87,4 +87,27 @@ class MacawManager:
             else:
                 return True, 'Command issued!'
 
+        return False, 'Instance is not running.'
+
+    def get_online_players(self) -> tuple:
+        # Check that the instance is running.
+        if self._aws_manager.get_state() == InstanceState.running:
+            try:
+                res = requests.get('https://{}:8080/status?key={}'.format(self._aws_manager.get_public_ip(),
+                                   credentials.macaw_key), timeout=3,
+                                   verify=False)
+            except:
+                return False, 'Macaw server is not running.'
+
+            status = res.status_code
+            json = res.json()
+
+            if status == 401:
+                return False, 'The Macaw API key is not correct, check the config.'
+            else:
+                players = json['players']
+                if len(players) < 1:
+                    return True, 'No-one is online :('
+                else:
+                    return True, '\n'.join(players)
         return False, 'Instance is not running.'
