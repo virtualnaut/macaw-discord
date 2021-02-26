@@ -37,7 +37,7 @@ class MacawBot(discord.Client):
             'help': (self._cmd_help, '`>help`: Display this help message.'),
             'start': (self._cmd_start, '`>start`: Start the servers and instance.'),
             'stop': (self._cmd_stop, '`>stop`: Stop the servers and instance.'),
-            'status': (self._cmd_status, '`>status`: Get the current status of the intance.'),
+            'status': (self._cmd_status, '`>status`: Get the current status of the instance.'),
             'issue': (self._cmd_issue, '`>issue [COMMAND]`: Issue a command to the Minecraft server.'),
             'players': (self._cmd_players, '`>players`: Get a list of currently online players.'),
             'dynmap': (self._cmd_dynmap, '`>dynmap`: Get the current dynmap address.')
