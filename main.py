@@ -23,6 +23,10 @@ STATUS_COLOURS = {
     80: 0xd11f00
 }
 
+class EmbedColours:
+    FAIL = 0xd11f00
+    SUCCESS = 0x04d45b
+
 
 class MacawBot(discord.Client):
     async def on_ready(self):
@@ -86,6 +90,16 @@ class MacawBot(discord.Client):
                 embed.add_field(name='Public IP Address', value=status['ip_address'], inline=False)
 
             await message.channel.send(embed=embed)
+
+        elif (message.content.startswith('>issue')):
+            result = macaw.issue(message.content[7:])
+
+            if result[0]:
+                embed = discord.Embed(title='Success', color=EmbedColours.SUCCESS, description=result[1])
+                await message.channel.send(embed=embed)
+            else:
+                embed = discord.Embed(title='Command not issued', color=EmbedColours.FAIL, description=result[1])
+                await message.channel.send(embed=embed)
 
 
 client = MacawBot()

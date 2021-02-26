@@ -65,3 +65,26 @@ class MacawManager:
                 return False, 'Failed to contact the Macaw server.'
 
         return False, 'The instance is not running!'
+
+    def issue(self, command: str):
+        # Check that the instance is running.
+        if self._aws_manager.get_state() == InstanceState.running:
+            try:
+                res = requests.post(
+                    'https://{}:8080/issue?key={}'.format(self._aws_manager.get_public_ip(), credentials.macaw_key),
+                    json={'command': command},
+                    timeout=3,
+                    verify=False)
+            except Timeout:
+                return False, 'Macaw server is not running.'
+
+            status = res.status_code
+
+            if status == 401:
+                return False, 'The Macaw API key is not correct, check the config.'
+            elif status == 503:
+                return False, 'The Minecraft server is not running yet.'
+            else:
+                return True, 'Command issued!'
+
+        return False, 'Instance is not running.'
