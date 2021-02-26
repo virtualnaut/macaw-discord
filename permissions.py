@@ -8,14 +8,15 @@ class Action:
     START = 1
     STATUS = 2
     ISSUE = 3
+    VIEW_PLAYERS = 4
 
 
 permissions = {
     'starter': [Action.START],
     'stopper': [Action.STOP],
     'status': [Action.STATUS],
-    'admin': [Action.START, Action.STOP, Action.STATUS, Action.ISSUE],
-    'trusted': [Action.START, Action.STATUS]
+    'admin': [Action.START, Action.STOP, Action.STATUS, Action.ISSUE, Action.VIEW_PLAYERS],
+    'trusted': [Action.START, Action.STATUS, Action.VIEW_PLAYERS]
 }
 
 
