@@ -91,7 +91,7 @@ class MacawBot(discord.Client):
 
             await message.channel.send(embed=embed)
 
-        elif (message.content.startswith('>issue')):
+        elif (message.content.startswith('>issue')) and (can_perform(Action.ISSUE, message.author, message.guild)):
             result = macaw.issue(message.content[7:])
 
             if result[0]:
