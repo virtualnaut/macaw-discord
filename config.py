@@ -37,3 +37,14 @@ class AWSConfig(Config):
 
         self.region = self._parser['default']['region']
         self.instance = self._parser['default']['instance']
+
+#
+# Class for other settings.
+#
+class SettingsConfig(Config):
+    def __init__(self):
+        super().__init__()
+
+        self._parse('./config/settings.ini')
+
+        self.check_delay = int(self._parser['default']['check_delay'])

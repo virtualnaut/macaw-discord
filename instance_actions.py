@@ -64,5 +64,13 @@ class AWSManager:
             'ip_address': self._instance.public_ip_address
         }
 
+    def get_state(self) -> int:
+        self._refresh()
+        return self._instance.state['Code']
+
+    def get_public_ip(self) -> str:
+        self._refresh()
+        return self._instance.public_ip_address
+
     def _refresh(self):
         self._instance = self._ec2.Instance(aws_config.instance)
