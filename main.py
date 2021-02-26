@@ -87,9 +87,6 @@ class MacawBot(discord.Client):
 
             await message.channel.send(embed=embed)
 
-        elif (message.content.startswith('>usage')) and (can_perform(Action.USAGE, message.author, message.guild)):
-            print(aws.get_usage())
-
 
 client = MacawBot()
 client.run(credentials.discord_bot_token)
