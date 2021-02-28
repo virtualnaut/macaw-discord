@@ -33,6 +33,7 @@ permissions = {
 }
 
 command_requirements = {
+    'help': [],
     'start': [Action.START],
     'stop': [Action.STOP],
     'status': [Action.STATUS],
@@ -74,7 +75,7 @@ def can_run(command, member, guild):
         
     member_actions = get_actions(member, guild)
 
-    if set(command_requirements[command]).difference(member_actions) == 0:
+    if len(set(command_requirements[command]).difference(member_actions)) == 0:
         return True
 
     return False

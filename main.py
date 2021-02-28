@@ -53,10 +53,10 @@ class MacawBot(discord.Client):
         if not message.content.startswith('>'):
             return
 
-        commands = self._commands.values()
-        for command, _ in commands:
-            if can_run(command, message.author, message.guild):
-                await command(message)
+        commands = self._commands.keys()
+        for command_name in commands:
+            if can_run(command_name, message.author, message.guild):
+                await self._commands[command_name][0](message)
 
     async def _cmd_start(self, message):
         if message.content == '>start':
